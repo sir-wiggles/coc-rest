@@ -18,7 +18,12 @@ export default class Request {
      */
     public static async init(): Promise<Request> {
         const r = new Request();
-        await r.prepareRequest();
+        try {
+            await r.prepareRequest();
+        } catch (e) {
+            logger.error("Request.init", e);
+            throw e;
+        }
         return r;
     }
 
@@ -26,8 +31,13 @@ export default class Request {
      * send makes the actual network call
      */
     public async send() {
-        const response = await axios(this.config);
-        (await Response.init(response)).show();
+        try {
+            const response = await axios(this.config);
+            (await Response.init(response)).show();
+        } catch (e) {
+            logger.error("Request.send", e);
+            throw e;
+        }
     }
 
     /*
@@ -39,9 +49,11 @@ export default class Request {
      */
     private async prepareRequest() {
         const l = await this.readLocal();
+        logger.debug("prepareRequest", { local: l });
         const g = await this.readGlobal();
+        logger.debug("prepareRequest", { global: g });
         this.config = this.prune(merge(g, l));
-        logger.info(this.config);
+        logger.debug("prepareRequest", { combined: this.config });
     }
 
     /*

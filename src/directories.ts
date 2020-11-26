@@ -1,4 +1,3 @@
-import os from "os";
 import fs from "fs";
 import { join } from "path";
 
@@ -13,7 +12,7 @@ import {
 } from "coc.nvim";
 
 import FilesList from "./files";
-import { state, logger, mkdir } from "./index";
+import { logger, mkdir } from "./index";
 
 export default class DirectoriesList extends BasicList {
     public readonly name = "workspaces";
@@ -33,19 +32,15 @@ export default class DirectoriesList extends BasicList {
 
         this.addAction("open", this.open);
         this.addAction("new", this.make);
-
-        logger.info("actions", this.actions);
     }
 
     public async open(item: ListItem) {
-        logger.info({ item: JSON.stringify(item) });
         listManager.registerList(new FilesList(workspace.nvim, item.data.path));
         await workspace.nvim.command("CocList rests");
     }
 
     public async make(item: ListItem) {
         const fn = await workspace.nvim.commandOutput("echo input('New workspace: ')");
-        logger.info("directory.new", JSON.stringify(item));
         const path = join(item.data.directory, fn);
         if (!fs.existsSync(<fs.PathLike>path)) {
             fs.mkdirSync(<fs.PathLike>path);
@@ -69,7 +64,6 @@ export default class DirectoriesList extends BasicList {
                     path: path,
                 },
             };
-            logger.info({ data });
 
             if (fs.lstatSync(path).isDirectory()) {
                 directories.push(data);

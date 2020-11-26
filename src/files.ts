@@ -10,7 +10,7 @@ import {
     Neovim,
 } from "coc.nvim";
 
-import { state, logger } from "./index";
+import { logger } from "./index";
 
 export const GLOBAL = "global.yaml";
 

@@ -1,6 +1,5 @@
 import {
     commands,
-    CompleteResult,
     ExtensionContext,
     listManager,
     workspace,
@@ -44,48 +43,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
         }),
 
         listManager.registerList(new DirectoriesList(workspace.nvim, root))
-
-        // sources.createSource({
-        // name: "coc-rest completion source", // unique id
-        // shortcut: "[CS]", // [CS] is custom source
-        // priority: 1,
-        // triggerPatterns: [], // RegExp pattern
-        // doComplete: async () => {
-        // const items = await getCompletionItems();
-        // return items;
-        // },
-        // }),
-
-        // workspace.registerKeymap(
-        // ["n"],
-        // "coc-rest-keymap",
-        // async () => {
-        // workspace.showMessage(`registerKeymap`);
-        // },
-        // { sync: false }
-        // ),
-
-        // workspace.registerAutocmd({
-        // event: "InsertLeave",
-        // request: true,
-        // callback: () => {
-        // workspace.showMessage(`registerAutocmd on InsertLeave`);
-        // },
-        // })
     );
-}
-
-async function getCompletionItems(): Promise<CompleteResult> {
-    return {
-        items: [
-            {
-                word: "TestCompletionItem 1",
-            },
-            {
-                word: "TestCompletionItem 2",
-            },
-        ],
-    };
 }
 
 export function expandPath(root: string): string {
