@@ -61,10 +61,10 @@
           "default": "~/.local/share/coc-rest",
           "description": "Directory location where you want your rest files saved."
         },
-        "coc-rest.workspace": {
+        "coc-rest.pin-workspace": {
           "type": "string",
           "default": "",
-          "description": "The workspace that you want to workon."
+          "description": "The workspace that you want to pin."
         }
       }
     },

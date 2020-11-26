@@ -13,7 +13,7 @@ import {
 } from "coc.nvim";
 
 import FilesList from "./files";
-import { state, logger } from "./index";
+import { state, logger, mkdir } from "./index";
 
 export default class DirectoriesList extends BasicList {
     public readonly name = "workspaces";
@@ -25,18 +25,11 @@ export default class DirectoriesList extends BasicList {
     constructor(nvim: Neovim, root: string) {
         super(nvim);
 
-        if (root && root[0] === "~") {
-            root = root.replace("~", os.homedir());
-        }
-
-        if (!fs.existsSync(<fs.PathLike>root)) {
-            fs.mkdirSync(<fs.PathLike>root);
-        }
-
-        this.root = root;
+        this.root = mkdir(root);
 
         // fu js!
         this.open = this.open.bind(this);
+        this.make = this.make.bind(this);
 
         this.addAction("open", this.open);
         this.addAction("new", this.make);
