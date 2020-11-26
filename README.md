@@ -90,7 +90,7 @@ method: post
 headers:
 params:
 data:
-    name: wiskers
+    name: whiskers
     color: black
 ```
 
