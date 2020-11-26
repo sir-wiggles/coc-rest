@@ -1,40 +1,24 @@
 # coc-rest
 
-TLDR: A coc-post or vim-rest-console like plugin but with more features.
+A coc-post or vim-rest-console like plugin but with more features.
 
-I wanted to create a plugin that was more like postman but in vim.  I've been 
-using vim-rest-console for a while now but found myself struggling with the syntax
-from time to time and coc-post was easier to use but without the global section
-I felt it was too annoying to repeate myself. So I made this very much a 
-work-in-progress plugin.
 
-Coc-rest has a concept of workspaces which is a collection of request calls. 
-Each workspace has its own global config that will be applied to all rests in 
-this workspace.  If you need to override a global variable put it in your rest
-file and that will take priority. If you want to remove a global from the request
-put the key in your rest and leave the value field blank; coc-rest will filter
-out keys where their value fields are null, none, nil what have you.
+## Features
 
-To create a new workspace run `CocList workspaces`.  You'll get a list of all
-existing workspaces. Now press `Tab`, you should see an action menu appear
-in the command prompt, then press `n` for new.  It'll prompt you to enter a name
-for the new workspace. A side effect of creating a new workspace is also opening 
-up a global file for that workspace.
+* Workspaces for organizing requests into logical groups
+* Global config per workspace that gets applied to all requests in a workspace
+* Syntax highlighting on output
 
-To create a new rest run `CocList rests`. and it'll be like creating a new 
-workspace above.
+### TODOs
+
+* Variables
+* Better buffer management
+
 
 ## Install
 
-If you're using plug then.
-
-`Plug 'sir-wiggles/coc-rest'`
-
-Otherwise use whatever plugin manager you use.
-
-I'll try and add this to the coc marketplace.
-
 `:CocInstall coc-rest`
+
 
 ## Keymaps
 
@@ -49,6 +33,68 @@ Some useful key mappings
 `:CocList workspaces`
 
 `:CocList rests`
+
+## Examples
+
+### Create A Workspace
+
+1. `:CocList workspaces`
+2. `Tab`
+3. `(n)ew`
+4. Enter in new name for workspace 
+
+After step 4 you'll see a `global.yaml` file open with the following 
+
+```yaml
+baseURL: 
+headers:
+```
+
+Here is where you'll put your `baseURL` and any headers that should be applied to any request in this workspace.
+
+An example would look like this
+```yaml
+baseURL: http://localhost:8000/api
+headers:
+    Content-Type: application/json
+```
+
+### Create A REST
+
+1. `:CocList workspaces`
+2. Select the workspace to create the REST in.
+3. `Tab`
+4. `(n)new`
+5. Enter in new name for REST
+
+After step 5 you'll see a file with the name you typed in above with the following fields
+
+```yaml
+url: 
+method: 
+headers:
+params:
+data:
+```
+
+An example would look like 
+```yaml
+url: /cats
+method: post
+headers:
+params:
+data:
+    name: wiskers
+    color: black
+```
+
+Building off of the global config, the request will looks like
+
+`curl -X POST http://localhost:8000/api/cats -H "Content-Type: applicatoin/json" -d '{"name": "wiskers", "color": "black"}'`
+
+### Create A REST 2
+
+If you set `coc-rest.pin-workspace` in your `CocConfig`, either local or global then you can skip going through the workspace list and go straight to `:CocList rests`.  This will take you to the workspace you have pined.
 
 ## License
 
