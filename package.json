@@ -1,6 +1,6 @@
 {
   "name": "coc-rest",
-  "version": "0.0.0-development",
+  "version": "0.0.1-development",
   "description": "A coc-post or vim-rest-console plugin but with more features.",
   "author": "Jeff Oryen <jeffmgreg@gmail.com>",
   "license": "MIT",

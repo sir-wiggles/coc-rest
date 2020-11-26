@@ -19,6 +19,12 @@ A coc-post or vim-rest-console like plugin but with more features.
 
 `:CocInstall coc-rest`
 
+If you want syntax highlighting then you'll need these plugins 
+
+`Plug 'inkarkat/vim-ingo-library'`
+`Plug 'inkarkat/vim-SyntaxRange'`
+
+
 
 ## Keymaps
 
@@ -64,7 +70,7 @@ headers:
 1. `:CocList workspaces`
 2. Select the workspace to create the REST in.
 3. `Tab`
-4. `(n)new`
+4. `(n)ew`
 5. Enter in new name for REST
 
 After step 5 you'll see a file with the name you typed in above with the following fields
