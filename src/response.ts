@@ -24,9 +24,9 @@ export default class Response {
      * show will print out all the information from the response
      */
     public async show() {
-        await this.buf.insert("== Headers ==", 0);
+        await this.buf.insert("<= Headers ==", 0);
         await this.setHead((await this.buf.length) - 1);
-        await this.buf.append("== Body ==");
+        await this.buf.append("<= Body ==");
         await this.setBody(await this.buf.length);
     }
 

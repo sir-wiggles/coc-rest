@@ -48,20 +48,22 @@ export default class Request {
      * the key name but leave the value blank.
      */
     private async prepareRequest() {
-        const l = await this.readLocal();
-        logger.debug("prepareRequest", { local: l });
-        const g = await this.readGlobal();
-        logger.debug("prepareRequest", { global: g });
-        this.config = this.prune(merge(g, l));
-        logger.debug("prepareRequest", { combined: this.config });
+        const [lc, lv] = await this.readLocal();
+        logger.info("prepareRequest", { local: [lc, lv] });
+        const [gc, gv] = await this.readGlobal();
+        logger.info("prepareRequest", { global: [gc, gv] });
+        const c = this.prune(merge(gc, lc));
+        const v = this.prune(merge(gv, lv));
+        this.config = this.interpolate(c, v);
+        logger.info("prepareRequest", { combined: this.config });
     }
 
     /*
      * readLocal reads the request buffer to be formed into a request
      */
-    private async readLocal(): Promise<AxiosRequestConfig> {
+    private async readLocal(): Promise<AxiosRequestConfig[]> {
         const lines = await (await this.nvim.buffer).lines;
-        return yaml.safeLoad(lines.join("\n"));
+        return yaml.safeLoadAll(lines.join("\n"));
     }
 
     /*
@@ -69,10 +71,10 @@ export default class Request {
      * request.  These request defaults are common to all the requests
      * in the workspace.
      */
-    private async readGlobal(): Promise<AxiosRequestConfig> {
+    private async readGlobal(): Promise<AxiosRequestConfig[]> {
         const file = join(dirname(workspace.uri), GLOBAL);
         const lines = await workspace.readFile(file);
-        return yaml.safeLoad(lines);
+        return yaml.safeLoadAll(lines);
     }
 
     /*
@@ -84,5 +86,14 @@ export default class Request {
                 return undefined;
             return value;
         });
+    }
+
+    private interpolate(config, params) {
+        const template = yaml.safeDump(config);
+        const names = Object.keys(params);
+        const vals = Object.values(params);
+        return yaml.safeLoad(
+            new Function(...names, `return \`${template}\`;`)(...vals)
+        );
     }
 }

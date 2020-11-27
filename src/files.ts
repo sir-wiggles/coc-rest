@@ -14,6 +14,25 @@ import { logger } from "./index";
 
 export const GLOBAL = "global.yaml";
 
+const globalTemplate = `
+# global config
+baseURL:
+headers:
+---
+# global variables
+`;
+
+const restTemplate = `
+# rest config
+url:
+method:
+headers:
+params:
+data:
+---
+# rest variables
+`;
+
 export default class FilesList extends BasicList {
     public readonly name = "rests";
     public readonly description = "a list of all rests within a workspace";
@@ -31,11 +50,7 @@ export default class FilesList extends BasicList {
 
         this.addAction("new", (item: ListItem) => {
             workspace.showMessage(`make new ${this.directory}`);
-            this.make(
-                item.data.directory,
-                ["url:", "method:", "headers:", "params:", "data:"],
-                false
-            );
+            this.make(item.data.directory, restTemplate.split("\n"), false);
         });
 
         this.addAction("delete", (item: ListItem) => {
@@ -65,7 +80,7 @@ export default class FilesList extends BasicList {
 
         if (files.length === 0) {
             const path = join(this.directory, GLOBAL);
-            await this.make(path, ["baseURL:", "headers:"], true);
+            await this.make(path, globalTemplate.split("\n"), true);
             return [{ label: GLOBAL, data: { path: path, directory: this.directory } }];
         }
         return files;

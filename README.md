@@ -8,12 +8,11 @@ A coc-post or vim-rest-console like plugin but with more features.
 * Workspaces for organizing requests into logical groups
 * Global config per workspace that gets applied to all requests in a workspace
 * Syntax highlighting on output
+* Variables
 
 ### TODOs
 
-* Variables
 * Better buffer management
-
 
 ## Install
 
@@ -23,8 +22,6 @@ If you want syntax highlighting then you'll need these plugins
 
 `Plug 'inkarkat/vim-ingo-library'`
 `Plug 'inkarkat/vim-SyntaxRange'`
-
-
 
 ## Keymaps
 
@@ -101,6 +98,27 @@ Building off of the global config, the request will looks like
 ### Create A REST 2
 
 If you set `coc-rest.pin-workspace` in your `CocConfig`, either local or global then you can skip going through the workspace list and go straight to `:CocList rests`.  This will take you to the workspace you have pined.
+
+## Variables
+
+Variables work like template literals in javascript.  
+```yaml
+url: /${path}
+method: post
+headers:
+params:
+data:
+    name: whiskers
+    color: black
+---
+path: cats
+```
+
+Will give you 
+
+`curl -X POST http://localhost:8000/api/cats -H "Content-Type: applicatoin/json" -d '{"name": "wiskers", "color": "black"}'`
+
+Variables can be specified in the global file and will be applied to all rests just like the config section.
 
 ## License
 
