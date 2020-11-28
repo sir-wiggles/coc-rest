@@ -2,17 +2,12 @@
 
 A coc-post or vim-rest-console like plugin but with more features.
 
-
 ## Features
 
 * Workspaces for organizing requests into logical groups
 * Global config per workspace that gets applied to all requests in a workspace
 * Syntax highlighting on output
 * Variables
-
-### TODOs
-
-* Better buffer management
 
 ## Install
 
@@ -27,9 +22,9 @@ If you want syntax highlighting then you'll need these plugins
 
 Some useful key mappings
 
-`nnoremap <silent> <leader>rs :CocCommand coc-rest.send<cr>`
-`nnoremap <silent> <leader>rr :CocList rests<cr>`
-`nnoremap <silent> <leader>rw :CocList workspaces<cr>`
+* `nnoremap <silent> <leader>rs :CocCommand coc-rest.send<cr>`
+* `nnoremap <silent> <leader>rr :CocList rests<cr>`
+* `nnoremap <silent> <leader>rw :CocList workspaces<cr>`
 
 ## Lists
 
@@ -51,6 +46,7 @@ After step 4 you'll see a `global.yaml` file open with the following
 ```yaml
 baseURL: 
 headers:
+---
 ```
 
 Here is where you'll put your `baseURL` and any headers that should be applied to any request in this workspace.
@@ -78,6 +74,7 @@ method:
 headers:
 params:
 data:
+---
 ```
 
 An example would look like 
@@ -116,7 +113,9 @@ path: cats
 
 Will give you 
 
-`curl -X POST http://localhost:8000/api/cats -H "Content-Type: applicatoin/json" -d '{"name": "wiskers", "color": "black"}'`
+```bash
+curl -X POST http://localhost:8000/api/cats -H "Content-Type: applicatoin/json" -d '{"name": "wiskers", "color": "black"}'
+```
 
 Variables can be specified in the global file and will be applied to all rests just like the config section.
 
