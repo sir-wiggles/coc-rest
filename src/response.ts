@@ -2,6 +2,8 @@ import { AxiosResponse } from "axios";
 import yaml from "js-yaml";
 import { workspace, Neovim, Buffer } from "coc.nvim";
 
+const OUTPUT_FILE_NAME = "__coc-rest-output__";
+
 export default class Response {
     private nvim: Neovim = workspace.nvim;
     private buf: any | Buffer;
@@ -16,7 +18,7 @@ export default class Response {
      */
     public static async init(response: AxiosResponse): Promise<Response> {
         const r = new Response(response);
-        await r.prepareBuffers();
+        await r.prepareOutput();
         return r;
     }
 
@@ -31,12 +33,24 @@ export default class Response {
     }
 
     /*
-     * prepareBuffers sets up the output for the response data while keeping
-     * reference to the input and output buffers.
+     * prepareOutput finds the previous output buffer if it exists and clears
+     * it for the new output. If no buffer is found the window is split.
      */
-    private async prepareBuffers() {
-        await this.nvim.command("vnew | set buftype=nofile");
+    private async prepareOutput() {
+        let bid = await this.nvim.commandOutput(`echo bufnr("${OUTPUT_FILE_NAME}")`);
+        if (bid === "-1") {
+            await this.nvim.command(`vsplit ${OUTPUT_FILE_NAME}`);
+            await this.nvim.command(`setlocal bt=nofile bh=hide noswapfile`);
+            bid = await this.nvim.commandOutput(`echo bufnr("${OUTPUT_FILE_NAME}")`);
+        }
+        const wid = await this.nvim.commandOutput(`echo bufwinnr(${bid})`);
+        if (wid === "-1") {
+            await this.nvim.command(`buffer ${bid}`);
+        } else {
+            await this.nvim.command(`${wid}wincmd w`);
+        }
         this.buf = await this.nvim.buffer;
+        await this.nvim.commandOutput("1,$d");
     }
 
     /*
