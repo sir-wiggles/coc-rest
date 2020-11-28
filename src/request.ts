@@ -11,7 +11,7 @@ import { GLOBAL } from "./files";
 
 export default class Request {
     private nvim: Neovim = workspace.nvim;
-    private config: AxiosRequestConfig = {};
+    private configs: AxiosRequestConfig[] = [];
 
     /*
      * init prepares the request to be sent
@@ -31,12 +31,15 @@ export default class Request {
      * send makes the actual network call
      */
     public async send() {
-        try {
-            const response = await axios(this.config);
-            (await Response.init(response)).show();
-        } catch (e) {
-            logger.error("Request.send", e);
-            throw e;
+        const r = await Response.init();
+        for (let i = 0; i < this.configs.length; i++) {
+            try {
+                const response = await axios(this.configs[i]);
+                await r.show(response, i + 1);
+            } catch (e) {
+                logger.error("Request.send", e);
+                throw e;
+            }
         }
     }
 
@@ -48,14 +51,15 @@ export default class Request {
      * the key name but leave the value blank.
      */
     private async prepareRequest() {
-        const [lc, lv] = await this.readLocal();
-        logger.info("prepareRequest", { local: [lc, lv] });
-        const [gc, gv] = await this.readGlobal();
-        logger.info("prepareRequest", { global: [gc, gv] });
-        const c = this.prune(merge(gc, lc));
-        const v = this.prune(merge(gv, lv));
-        this.config = this.interpolate(c, v);
-        logger.info("prepareRequest", { combined: this.config });
+        const locals = await this.readLocal();
+        logger.info("prepareRequest", { locals });
+        const global = await this.readGlobal();
+        logger.info("prepareRequest", { global });
+        locals.forEach((local) => {
+            const c: any = this.prune(merge(global, local));
+            this.configs.push(this.interpolate(c, c.variables));
+        });
+        logger.info("prepareRequest", { configs: this.configs });
     }
 
     /*
@@ -71,10 +75,10 @@ export default class Request {
      * request.  These request defaults are common to all the requests
      * in the workspace.
      */
-    private async readGlobal(): Promise<AxiosRequestConfig[]> {
+    private async readGlobal(): Promise<AxiosRequestConfig> {
         const file = join(dirname(workspace.uri), GLOBAL);
         const lines = await workspace.readFile(file);
-        return yaml.safeLoadAll(lines);
+        return yaml.safeLoad(lines);
     }
 
     /*

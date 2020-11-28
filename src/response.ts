@@ -7,17 +7,13 @@ const OUTPUT_FILE_NAME = "__coc-rest-output__";
 export default class Response {
     private nvim: Neovim = workspace.nvim;
     private buf: any | Buffer;
-    private response: any;
-
-    constructor(response: any) {
-        this.response = response;
-    }
+    private response: any = {};
 
     /*
      * init prepares the output buffer for display
      */
-    public static async init(response: AxiosResponse): Promise<Response> {
-        const r = new Response(response);
+    public static async init(): Promise<Response> {
+        const r = new Response();
         await r.prepareOutput();
         return r;
     }
@@ -25,11 +21,18 @@ export default class Response {
     /*
      * show will print out all the information from the response
      */
-    public async show() {
-        await this.buf.insert("<= Headers ==", 0);
-        await this.setHead((await this.buf.length) - 1);
+    public async show(response: AxiosResponse, configNumber: number) {
+        this.response = response;
+        await this.buf.append(
+            `========== Request #${configNumber} ==========`,
+            this.buf.length
+        );
+        await this.buf.append("<= Headers ==", this.buf.length);
+        await this.setHead(await this.buf.length);
+        await this.buf.append("");
         await this.buf.append("<= Body ==");
         await this.setBody(await this.buf.length);
+        await this.buf.append("");
     }
 
     /*
@@ -61,8 +64,8 @@ export default class Response {
             .safeDump(this.response.headers, { sortKeys: true })
             .trim()
             .split("\n");
-        await this.buf.insert(lines, offset);
-        this.setFormat([offset + 1, offset + lines.length], "yaml");
+        await this.buf.append(lines, offset);
+        await this.setFormat([offset + 1, offset + lines.length], "yaml");
     }
 
     /*
@@ -70,8 +73,8 @@ export default class Response {
      */
     private async setBody(offset: number) {
         const lines = JSON.stringify(this.response.data, null, 4).split("\n");
-        await this.buf.insert(lines, offset);
-        this.setFormat([offset + 1, offset + lines.length], "json");
+        await this.buf.append(lines, offset);
+        await this.setFormat([offset + 1, offset + lines.length], "json");
     }
 
     /*

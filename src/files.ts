@@ -18,8 +18,7 @@ const globalTemplate = `
 # global config
 baseURL:
 headers:
----
-# global variables
+variables: 
 `;
 
 const restTemplate = `
@@ -29,8 +28,7 @@ method:
 headers:
 params:
 data:
----
-# rest variables
+variables: 
 `;
 
 export default class FilesList extends BasicList {

@@ -1,6 +1,6 @@
 # coc-rest
 
-A coc-post or vim-rest-console like plugin but with more features.
+A powerful rest client with many features
 
 ## Features
 
@@ -8,6 +8,8 @@ A coc-post or vim-rest-console like plugin but with more features.
 * Global config per workspace that gets applied to all requests in a workspace
 * Syntax highlighting on output
 * Variables
+* Multiple requests 
+* Simple YAML syntax
 
 ## Install
 
@@ -46,7 +48,7 @@ After step 4 you'll see a `global.yaml` file open with the following
 ```yaml
 baseURL: 
 headers:
----
+variables:
 ```
 
 Here is where you'll put your `baseURL` and any headers that should be applied to any request in this workspace.
@@ -74,6 +76,7 @@ method:
 headers:
 params:
 data:
+variables:
 ---
 ```
 
@@ -107,8 +110,8 @@ params:
 data:
     name: whiskers
     color: black
----
-path: cats
+variables:
+    path: cats
 ```
 
 Will give you 
@@ -118,6 +121,34 @@ curl -X POST http://localhost:8000/api/cats -H "Content-Type: applicatoin/json" 
 ```
 
 Variables can be specified in the global file and will be applied to all rests just like the config section.
+
+## Sending Multiple Requests Per REST File
+
+To send more than one request per REST file just add another config section to the rest
+
+```
+url: /${path}
+method: post
+headers:
+params:
+data:
+    name: whiskers
+    color: black
+variables:
+    path: cats
+---
+url: /${path}
+method: post
+headers:
+params:
+data:
+    name: spot
+    color: brown
+variables:
+    path: dogs
+```
+
+Please note that the variables from the first request don't propagate to the next request. In the example above, variables.path, must be supplied for both requests for the url to be interpolated.  If path was the same then it may make sense to move that variable to the global file for this workspace.
 
 ## License
 
