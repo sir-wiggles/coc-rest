@@ -1,3 +1,4 @@
+import qs from "querystring";
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import columnify from "columnify";
 import yaml from "js-yaml";
@@ -57,6 +58,12 @@ export default class Request {
         logger.info("prepareRequest", { global });
         locals.forEach((local) => {
             const c: any = this.prune(merge(global, local));
+            if (
+                c.headers &&
+                c.headers["Content-Type"] === "application/x-www-form-urlencoded"
+            ) {
+                c.data = qs.stringify(c.data);
+            }
             this.configs.push(this.interpolate(c, c.variables));
         });
         logger.info("prepareRequest", { configs: this.configs });
