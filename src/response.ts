@@ -1,4 +1,4 @@
-import { AxiosResponse } from "axios";
+import { AxiosResponse, AxiosError } from "axios";
 import yaml from "js-yaml";
 import { workspace, Neovim, Buffer } from "coc.nvim";
 
@@ -33,6 +33,11 @@ export default class Response {
         await this.buf.append("<= Body ==");
         await this.setBody(await this.buf.length);
         await this.buf.append("");
+    }
+
+    public async error(error: AxiosError, configNumber: number) {
+        this.show(error.response as AxiosResponse, configNumber);
+        return;
     }
 
     /*

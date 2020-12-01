@@ -1,8 +1,8 @@
 import qs from "querystring";
-import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
+import axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from "axios";
 import columnify from "columnify";
 import yaml from "js-yaml";
-import { merge } from "lodash";
+import { merge, transform } from "lodash";
 import { workspace, Neovim, Buffer } from "coc.nvim";
 
 import { dirname, join } from "path";
@@ -37,9 +37,9 @@ export default class Request {
             try {
                 const response = await axios(this.configs[i]);
                 await r.show(response, i + 1);
-            } catch (e) {
+            } catch (e: any) {
                 logger.error("Request.send", e);
-                throw e;
+                await r.error(e, i + 1);
             }
         }
     }
@@ -58,9 +58,13 @@ export default class Request {
         logger.info("prepareRequest", { global });
         locals.forEach((local) => {
             const c: any = this.prune(merge(global, local));
+
+            const headers = transform(c.headers, (result, val, key) => {
+                result[key.toLowerCase()] = val;
+            });
             if (
-                c.headers &&
-                c.headers["Content-Type"] === "application/x-www-form-urlencoded"
+                headers &&
+                headers["content-type"] === "application/x-www-form-urlencoded"
             ) {
                 c.data = qs.stringify(c.data);
             }
