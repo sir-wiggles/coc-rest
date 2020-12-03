@@ -30,18 +30,16 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
     const pin = config.get<string>("pin-workspace", "");
     if (pin) {
-        workspace.showMessage(root);
         mkdir(join(root, pin));
         listManager.registerList(new FilesList(workspace.nvim, join(root, pin)));
     }
 
+    commands.registerCommand("coc-rest.send", async () => {
+        workspace.showMessage("sending...");
+        await (await Request.init()).send();
+        workspace.showMessage("");
+    });
     context.subscriptions.push(
-        commands.registerCommand("coc-rest.send", async () => {
-            workspace.showMessage("sending...");
-            (await Request.init()).send();
-            workspace.showMessage("");
-        }),
-
         listManager.registerList(new DirectoriesList(workspace.nvim, root))
     );
 }

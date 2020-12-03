@@ -14,16 +14,12 @@ import { logger } from "./index";
 
 export const GLOBAL = "global.yaml";
 
-const globalTemplate = `
-# global config
-baseURL:
+const globalTemplate = `baseURL:
 headers:
 variables: 
 `;
 
-const restTemplate = `
-# rest config
-url:
+const restTemplate = `url:
 method:
 headers:
 params:
@@ -57,7 +53,7 @@ export default class FilesList extends BasicList {
 
         this.addAction("global", (item: ListItem) => {
             workspace.showMessage(`Open global file for ${item.data.directory}`);
-            workspace.openResource(join(item.data.path, GLOBAL));
+            workspace.openResource(join(item.data.directory, GLOBAL));
         });
     }
 

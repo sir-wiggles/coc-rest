@@ -42,6 +42,8 @@ export default class Request {
                 await r.error(e, i + 1);
             }
         }
+        logger.warn("switching buffer");
+        await this.nvim.command(`${r.pre}wincmd w`);
     }
 
     /*

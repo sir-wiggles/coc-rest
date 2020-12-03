@@ -2,11 +2,14 @@ import { AxiosResponse, AxiosError } from "axios";
 import yaml from "js-yaml";
 import { workspace, Neovim, Buffer } from "coc.nvim";
 
+import { logger } from "./index";
+
 const OUTPUT_FILE_NAME = "__coc-rest-output__";
 
 export default class Response {
     private nvim: Neovim = workspace.nvim;
     private buf: any | Buffer;
+    public pre: any | Buffer;
     private response: any = {};
 
     /*
@@ -25,18 +28,19 @@ export default class Response {
         this.response = response;
         await this.buf.append(
             `========== Request #${configNumber} ==========`,
-            this.buf.length
+            await this.buf.length
         );
-        await this.buf.append("<= Headers ==", this.buf.length);
+        await this.buf.append("<= Headers ==", await this.buf.length);
         await this.setHead(await this.buf.length);
         await this.buf.append("");
         await this.buf.append("<= Body ==");
         await this.setBody(await this.buf.length);
         await this.buf.append("");
+        return;
     }
 
     public async error(error: AxiosError, configNumber: number) {
-        this.show(error.response as AxiosResponse, configNumber);
+        await this.show(error.response as AxiosResponse, configNumber);
         return;
     }
 
@@ -45,6 +49,7 @@ export default class Response {
      * it for the new output. If no buffer is found the window is split.
      */
     private async prepareOutput() {
+        this.pre = await this.nvim.commandOutput(`echo bufwinnr(bufnr("%"))`);
         let bid = await this.nvim.commandOutput(`echo bufnr("${OUTPUT_FILE_NAME}")`);
         if (bid === "-1") {
             await this.nvim.command(`vsplit ${OUTPUT_FILE_NAME}`);
@@ -59,6 +64,7 @@ export default class Response {
         }
         this.buf = await this.nvim.buffer;
         await this.nvim.commandOutput("1,$d");
+        return;
     }
 
     /*
@@ -90,6 +96,6 @@ export default class Response {
      */
     private async setFormat(range: number[], syntax: string) {
         const format = `${range[0]},${range[1]}:SyntaxInclude ${syntax}`;
-        await this.nvim.command(format);
+        await this.nvim.commandOutput(format);
     }
 }
