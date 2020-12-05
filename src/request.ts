@@ -55,9 +55,9 @@ export default class Request {
      */
     private async prepareRequest() {
         const locals = await this.readLocal();
-        logger.info("prepareRequest", { locals });
+        logger.info("prepareRequest", { local: JSON.stringify(locals, null, 4) });
         const global = await this.readGlobal();
-        logger.info("prepareRequest", { global });
+        logger.info("prepareRequest", { global: JSON.stringify(global, null, 4) });
         locals.forEach((local) => {
             const c: any = this.prune(merge(global, local));
 
@@ -71,8 +71,10 @@ export default class Request {
                 c.data = qs.stringify(c.data);
             }
             this.configs.push(this.interpolate(c, c.variables));
+            c.paramsSerializer = (params) => {
+                return qs.stringify(params);
+            };
         });
-        logger.info("prepareRequest", { configs: this.configs });
     }
 
     /*
