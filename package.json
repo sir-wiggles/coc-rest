@@ -1,6 +1,7 @@
 {
   "name": "coc-rest",
-  "version": "0.0.8-development",
+  "version": "0.1.0",
+  "homepage": "https://github.com/sir-wiggles/coc-rest#README.md",
   "description": "A coc-post or vim-rest-console plugin but with more features.",
   "author": "Jeff Oryen <jeffmgreg@gmail.com>",
   "license": "MIT",
@@ -77,6 +78,7 @@
   },
   "dependencies": {
     "axios": "^0.21.0",
+    "axios-curlirize": "^1.3.7",
     "columnify": "^1.5.4",
     "js-yaml": "^3.14.0",
     "lodash": "^4.17.20",

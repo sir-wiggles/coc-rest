@@ -1,0 +1,18 @@
+#!/bin/bash
+
+COMMAND=$(cat <<EOF
+(async function(){
+    var repl = require('repl');
+
+    process.stdin.push('.load ${1}\n');
+
+    repl.start({
+        useGlobal:true,
+        ignoreUndefined:true,
+        prompt:'> '
+    });
+})();
+EOF
+)
+
+node --experimental-repl-await -e "${COMMAND}"

@@ -30,8 +30,12 @@ export default class Response {
             `========== Request #${configNumber} ==========`,
             await this.buf.length
         );
+        await this.buf.append("== Headers =>", await this.buf.length);
+        await this.setHeadOut(await this.buf.length);
+
         await this.buf.append("<= Headers ==", await this.buf.length);
-        await this.setHead(await this.buf.length);
+        await this.setHeadIn(await this.buf.length);
+
         await this.buf.append("");
         await this.buf.append("<= Body ==");
         await this.setBody(await this.buf.length);
@@ -66,15 +70,25 @@ export default class Response {
         await this.nvim.commandOutput("1,$d");
         return;
     }
+    /*
+     * setHeadOut will output the response headers to the output buffer.
+     */
+    private async setHeadOut(offset: number) {
+        const lines = this.response.request._header.trim().split("\r\n");
+        lines.push("");
+        await this.buf.append(lines, offset);
+        await this.setFormat([offset + 1, offset + lines.length], "yaml");
+    }
 
     /*
-     * setHead will output the response headers to the output buffer.
+     * setHeadIn will output the response headers to the output buffer.
      */
-    private async setHead(offset: number) {
+    private async setHeadIn(offset: number) {
         const lines = yaml
             .safeDump(this.response.headers, { sortKeys: true })
             .trim()
             .split("\n");
+        lines.push(this.response.status + " " + this.response.statusText);
         await this.buf.append(lines, offset);
         await this.setFormat([offset + 1, offset + lines.length], "yaml");
     }

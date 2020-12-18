@@ -1,5 +1,6 @@
 import qs from "querystring";
 import axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from "axios";
+import curlirize from "axios-curlirize";
 import columnify from "columnify";
 import yaml from "js-yaml";
 import { merge, transform } from "lodash";
@@ -9,6 +10,8 @@ import { dirname, join } from "path";
 import { logger } from "./index";
 import Response from "./response";
 import { GLOBAL } from "./files";
+
+curlirize(axios);
 
 export default class Request {
     private nvim: Neovim = workspace.nvim;
