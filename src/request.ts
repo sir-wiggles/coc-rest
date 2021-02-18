@@ -62,7 +62,10 @@ export default class Request {
         const global = await this.readGlobal();
         logger.info("prepareRequest", { global: JSON.stringify(global, null, 4) });
         locals.forEach((local) => {
-            const c: any = this.prune(merge(global, local));
+            const merged = merge(global, local);
+            logger.info("prepareRequest-merged", merged);
+            const c: any = this.prune(merged);
+            logger.info("prepareRequest-pruned", c);
 
             const headers = transform(c.headers, (result, val, key) => {
                 result[key.toLowerCase()] = val;
@@ -73,7 +76,11 @@ export default class Request {
             ) {
                 c.data = qs.stringify(c.data);
             }
-            this.configs.push(this.interpolate(c, c.variables));
+            if (c.variables) {
+                this.configs.push(this.interpolate(c, c.variables));
+            } else {
+                this.configs.push(c);
+            }
             c.paramsSerializer = (params) => {
                 return qs.stringify(params);
             };
